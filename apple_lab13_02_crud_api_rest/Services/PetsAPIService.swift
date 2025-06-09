@@ -12,7 +12,7 @@ import Foundation
 class PetsAPIService: ObservableObject {
     static let shared = PetsAPIService()
     private let session = URLSession.shared
-    private let baseURL = "http://localhost:8080"
+    private let baseURL = "http://3.92.45.93:8080"
     
     @Published var pets: [Pet] = []
     @Published var isLoading = false

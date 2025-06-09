@@ -29,9 +29,22 @@
 		8B5637212DF0F564004B7BD4 /* apple_lab13_02_crud_api_restUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = apple_lab13_02_crud_api_restUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		859A63A62DF3D89900215E4E /* Exceptions for "apple_lab13_02_crud_api_rest" folder in "apple_lab13_02_crud_api_rest" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"apple-lab13-02-crud-api-rest-Info.plist",
+			);
+			target = 8B5637062DF0F561004B7BD4 /* apple_lab13_02_crud_api_rest */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		8B5637092DF0F561004B7BD4 /* apple_lab13_02_crud_api_rest */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				859A63A62DF3D89900215E4E /* Exceptions for "apple_lab13_02_crud_api_rest" folder in "apple_lab13_02_crud_api_rest" target */,
+			);
 			path = apple_lab13_02_crud_api_rest;
 			sourceTree = "<group>";
 		};
@@ -398,6 +411,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"apple_lab13_02_crud_api_rest/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "apple-lab13-02-crud-api-rest-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -426,6 +440,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"apple_lab13_02_crud_api_rest/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "apple-lab13-02-crud-api-rest-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
