@@ -9,7 +9,11 @@ import SwiftUI
 
 // MARK: - Views/AddPetView.swift
 struct AddPetView: View {
-    @StateObject private var apiService = PetsAPIService.shared
+    
+    //@StateObject private var apiService = PetViewModel.shared
+    @ObservedObject var petViewModel: PetViewModel
+
+    
     @Environment(\.presentationMode) var presentationMode
     
     @State private var name = ""
@@ -89,16 +93,9 @@ struct AddPetView: View {
         )
         
         Task {
-            do {
-                _ = try await apiService.createPet(newPet)
-                await MainActor.run {
-                    presentationMode.wrappedValue.dismiss()
-                }
-            } catch {
-                await MainActor.run {
-                    errorMessage = error.localizedDescription
-                    isSubmitting = false
-                }
+            _ = await petViewModel.createPet(newPet)
+            await MainActor.run {
+                presentationMode.wrappedValue.dismiss()
             }
         }
     }

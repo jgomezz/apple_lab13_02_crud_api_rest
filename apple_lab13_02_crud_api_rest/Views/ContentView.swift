@@ -9,7 +9,9 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var apiService = PetsAPIService.shared
+    
+    @StateObject private var petViewModel = PetViewModel()
+    
     @State private var showingAddPet = false
     @State private var selectedPet: Pet?
     @State private var showingEditPet = false
@@ -19,18 +21,18 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             Group {
-                if apiService.isLoading && apiService.pets.isEmpty {
+                if petViewModel.isLoading && petViewModel.pets.isEmpty {
                     ProgressView("Loading pets...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if apiService.pets.isEmpty && !apiService.isLoading {
+                } else if petViewModel.pets.isEmpty && !petViewModel.isLoading {
                     EmptyStateView {
                         Task {
-                            await apiService.fetchPets()
+                            await petViewModel.fetchPets()
                         }
                     }
                 } else {
                     PetsListView(
-                        pets: apiService.pets,
+                        pets: petViewModel.pets,
                         onEdit: { pet in
                             selectedPet = pet
                             showingEditPet = true
@@ -41,7 +43,7 @@ struct ContentView: View {
                         }
                     )
                     .refreshable {
-                        await apiService.fetchPets()
+                        await petViewModel.fetchPets()
                     }
                 }
             }
@@ -58,17 +60,17 @@ struct ContentView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Refresh") {
                         Task {
-                            await apiService.fetchPets()
+                            await petViewModel.fetchPets()
                         }
                     }
                 }
             }
             .sheet(isPresented: $showingAddPet) {
-                AddPetView()
+                AddPetView(petViewModel: petViewModel)
             }
             .sheet(isPresented: $showingEditPet) {
                 if let pet = selectedPet {
-                    EditPetView(pet: pet)
+                    EditPetView(petViewModel:petViewModel, pet: pet)
                 }
             }
             .alert("Delete Pet", isPresented: $showingDeleteAlert) {
@@ -85,27 +87,25 @@ struct ContentView: View {
                     Text("Are you sure you want to delete \(pet.name)?")
                 }
             }
-            .alert("Error", isPresented: .constant(apiService.errorMessage != nil)) {
+            .alert("Error", isPresented: .constant(petViewModel.errorMessage != nil)) {
                 Button("OK") {
-                    apiService.errorMessage = nil
+                    petViewModel.errorMessage = nil
                 }
             } message: {
-                Text(apiService.errorMessage ?? "")
+                Text(petViewModel.errorMessage ?? "")
             }
             .task {
-                if apiService.pets.isEmpty {
-                    await apiService.fetchPets()
+                if petViewModel.pets.isEmpty {
+                    await petViewModel.fetchPets()
                 }
             }
         }
     }
     
     private func deletePet(_ pet: Pet) async {
-        do {
-            try await apiService.deletePet(id: pet.id)
-        } catch {
-            apiService.errorMessage = error.localizedDescription
-        }
+
+        _ = await petViewModel.deletePet(id: pet.id)
+
     }
 }
 

@@ -9,7 +9,9 @@ import SwiftUI
 
 // MARK: - Views/EditPetView.swift
 struct EditPetView: View {
-    @StateObject private var apiService = PetsAPIService.shared
+    //@StateObject private var apiService = PetViewModel.shared
+    @ObservedObject var petViewModel: PetViewModel
+
     @Environment(\.presentationMode) var presentationMode
     
     @State private var name: String
@@ -20,13 +22,15 @@ struct EditPetView: View {
     @State private var errorMessage: String?
     
     private let pet: Pet
+    
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
     
-    init(pet: Pet) {
+    init(petViewModel: PetViewModel, pet: Pet) {
+        self.petViewModel = petViewModel
         self.pet = pet
         self._name = State(initialValue: pet.name)
         self._selectedTypeId = State(initialValue: pet.typeId)
@@ -104,17 +108,7 @@ struct EditPetView: View {
 
         
         Task {
-            do {
-                _ = try await apiService.updatePet(updatedPet)
-                await MainActor.run {
-                    presentationMode.wrappedValue.dismiss()
-                }
-            } catch {
-                await MainActor.run {
-                    errorMessage = error.localizedDescription
-                    isUpdating = false
-                }
-            }
+            await petViewModel.updatePet(updatedPet)
         }
     }
 }

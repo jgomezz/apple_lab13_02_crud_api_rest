@@ -1,59 +1,42 @@
 //
-//  PetsAPIService.swift
-//  apple_lab13_02_crud_api_rest
+//  PetService.swift
+//  apple_lab13_01_api_rest
 //
-//  Created by developer on 6/4/25.
+//  Created by Jaime Gomez on 8/6/25.
 //
 
-// MARK: - Services/PetsAPIService.swift
+// MARK: - Services/PetService.swift
 import Foundation
 
-@MainActor
-class PetsAPIService: ObservableObject {
-    static let shared = PetsAPIService()
+protocol PetServiceProtocol {
+    func fetchPets() async throws -> [Pet]
+    func fetchPet(id: Int) async throws -> Pet
+    func createPet(_ pet: Pet) async throws -> Pet
+    func updatePet(_ pet: Pet) async throws -> Pet
+    func deletePet(id: Int) async throws
+}
+
+class PetService: PetServiceProtocol {
     private let session = URLSession.shared
-    private let baseURL = "http://3.92.45.93:8080"
-    
-    @Published var pets: [Pet] = []
-    @Published var isLoading = false
-    @Published var errorMessage: String?
-    
-    private init() {}
+    private let baseURL = "http://ec2-54-173-250-127.compute-1.amazonaws.com:8080"
     
     // MARK: - GET All Pets
-    func fetchPets() async {
-        isLoading = true
-        errorMessage = nil
-        
+    func fetchPets() async throws -> [Pet] {
         guard let url = URL(string: "\(baseURL)/pets") else {
-            errorMessage = NetworkError.invalidURL.localizedDescription
-            isLoading = false
-            return
+            throw NetworkError.invalidURL
         }
         
-        do {
-            let (data, response) = try await session.data(from: url)
-            
-            guard let httpResponse = response as? HTTPURLResponse else {
-                throw NetworkError.connectionFailed
-            }
-            
-            guard (200...299).contains(httpResponse.statusCode) else {
-                throw NetworkError.serverError(httpResponse.statusCode)
-            }
-            
-            let decodedPets = try JSONDecoder().decode([Pet].self, from: data)
-            self.pets = decodedPets
-            
-        } catch {
-            if let networkError = error as? NetworkError {
-                self.errorMessage = networkError.localizedDescription
-            } else {
-                self.errorMessage = NetworkError.networkError(error).localizedDescription
-            }
+        let (data, response) = try await session.data(from: url)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NetworkError.connectionFailed
         }
         
-        isLoading = false
+        guard (200...299).contains(httpResponse.statusCode) else {
+            throw NetworkError.serverError(httpResponse.statusCode)
+        }
+        
+        return try JSONDecoder().decode([Pet].self, from: data)
     }
     
     // MARK: - GET Pet by ID
@@ -95,14 +78,7 @@ class PetsAPIService: ObservableObject {
             throw NetworkError.serverError(0)
         }
         
-        let createdPet = try JSONDecoder().decode(Pet.self, from: data)
-        
-        // Update local pets array
-        await MainActor.run {
-            self.pets.append(createdPet)
-        }
-        
-        return createdPet
+        return try JSONDecoder().decode(Pet.self, from: data)
     }
     
     // MARK: - PUT Update Pet
@@ -123,16 +99,7 @@ class PetsAPIService: ObservableObject {
             throw NetworkError.serverError(0)
         }
         
-        let updatedPet = try JSONDecoder().decode(Pet.self, from: data)
-        
-        // Update local pets array
-        await MainActor.run {
-            if let index = self.pets.firstIndex(where: { $0.id == pet.id }) {
-                self.pets[index] = updatedPet
-            }
-        }
-        
-        return updatedPet
+        return try JSONDecoder().decode(Pet.self, from: data)
     }
     
     // MARK: - DELETE Pet
@@ -149,11 +116,6 @@ class PetsAPIService: ObservableObject {
         guard let httpResponse = response as? HTTPURLResponse,
               (200...299).contains(httpResponse.statusCode) else {
             throw NetworkError.serverError(0)
-        }
-        
-        // Remove from local pets array
-        await MainActor.run {
-            self.pets.removeAll { $0.id == id }
         }
     }
 }
